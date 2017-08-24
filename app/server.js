@@ -12,7 +12,7 @@ const io = soketIO(server);
 const PORT = 3000;
 const allConferences = {};
 
-app.use('/', serveStatic(__dirname + 'build'));
+app.use('/', serveStatic(__dirname + '..' + 'build'));
 
 server.listen(PORT, () => {
     console.log(`server listen ${PORT}`);
