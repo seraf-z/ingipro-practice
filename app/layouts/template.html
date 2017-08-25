@@ -6,8 +6,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="login">
-
+    <div class="login hide">
         <form>
           <h2>Введите логин!</h2>
           <div class="input-group input-group-lg">
@@ -17,21 +16,23 @@
             </span>
           </div>
         </form>
+    </div>
+    <div class="wrapper hide">
+        <div class="sidebar">
+            <div class="users hide">
+                <!-- users markup -->
+            </div>
+            <div class="chat hide">
+                <div class="chat-message"></div>
+                <form>
+                    <input type="text" class="chat-input">
+                    <input type="submit" value="Отправить" class="chat-submit">
+                </form>
+            </div>
+        </div>
+        <div class="layout hide"></div>
+    </div>
 
-    </div>
-    <div class="users">
-        <!-- users markup -->
-    </div>
-    <div class="layout">
-        <!-- layout markup -->
-    </div>
-    <div class="chat">
-        <div class="chat-message"></div>
-        <form>
-            <input type="text" class="chat-input">
-            <input type="submit" value="Отправить" class="chat-submit">
-        </form>
-    </div>
-	<script type="text/javascript" src="http://cdn.voximplant.com/edge/voximplant.min.js"></script>
+	<script src="http://cdn.voximplant.com/edge/voximplant.min.js"></script>
 </body>
 </html>

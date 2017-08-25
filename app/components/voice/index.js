@@ -62,8 +62,8 @@ class Voice {
         mediator.on('user:join', this._handleUserJoin.bind(this));
     }
     _handleUserJoin(event) {
-        this.userName = event.payload.name;
-        this.userId = event.payload.name + Date.now();
+        this.userName = event.name;
+        this.userId = event.name + Date.now();
 
         this.currentCall = this.vox.call({
             number: 'entrypoint',

@@ -3,11 +3,9 @@
 }
 
 .layout {
-    top: 10%;
-    left: 10%;
-    width: 80%;
-    height: 80%;
-    position: absolute;
+    flex-grow: 1;
+    align-self: stretch;
+    position: relative;
     display: flex;
     background: lightgreen;
 }

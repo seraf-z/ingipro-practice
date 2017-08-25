@@ -15,7 +15,7 @@ function getConfig(env) {
 
         entry: [
             'babel-polyfill',
-            './client.js',
+            './components/bootstrap/index.js',
         ],
         output: {
             filename: isDevelopment ? 'build.js' : 'build.min.js',

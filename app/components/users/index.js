@@ -23,12 +23,10 @@ class Users {
 	}
 
     _showUser(item) {
-    	const allUsers = this._domNode.querySelector('.users');
-
 	    const newUser = document.createElement('div');
 	    newUser.id = item.userId;
 	    newUser.className = 'user';
-	    allUsers.appendChild(newUser);
+	    this._domNode.appendChild(newUser);
 
 	   	const userColor = document.createElement('div');
 	    userColor.className = 'userColor';

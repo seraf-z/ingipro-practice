@@ -1,11 +1,12 @@
-import Layout from 'components/layout';
-import Login from 'components/login';
-import Users from 'components/users';
-import Chat from 'components/chat';
-import mediator from 'components/mediator'; // instance of component
-import 'components/store';
-import 'components/voice';
-import 'components/websocket';
+import Layout from '../layout';
+import Login from '../login';
+import Users from '../users';
+import Chat from '../chat';
+import mediator from '../mediator'; // instance of component
+import '../store';
+import '../voice';
+import '../websocket';
+import './style.css';
 
 // create instanses of ui components
 const layout = new Layout(document.querySelector('.layout'));
@@ -22,6 +23,8 @@ mediator.on('conference:sync', () => {
     layout.show();
     users.show();
     chat.show();
+
+    document.querySelector('.wrapper').classList.remove('hide');
 });
 
 mediator.on('*', (data, type) => {

@@ -6,9 +6,6 @@ import './style.css';
 class Layout {
 
     constructor(domNode) {
-        //@fixme remove `console.log`
-        // eslint-disable-next-line
-        console.log('"Layout" created');
         this._domNode = domNode;
 
         this._createLayout();
@@ -51,8 +48,6 @@ class Layout {
             tapes[0].lastTapeId = 0;
             tapes[0].direction = false;
             tapes[0].view = true;
-            document.body.appendChild(tapes[0].elem);
-
             tapes[0].ratio = tapes[0].elem.offsetWidth / tapes[0].elem.offsetHeight;
             tapes[0].lineCell = BORDER / 2 * tapes[0].elem.offsetHeight / 100;
         }
