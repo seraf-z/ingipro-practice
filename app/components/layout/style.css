@@ -21,25 +21,19 @@
 }
 
 .line {
-    position: absolute;
-    background: #87ceeb;
     cursor: pointer;
 }
 
-.internalLine {
+.tapeLine {
     background: #87ceeb;
-    cursor: pointer;
 }
 
 .cellLine {
-    position: absolute;
     background: black;
-    cursor: pointer;
 }
 
-.internalCellLine {
-    background: black;
-    cursor: pointer;
+.external {
+    position: absolute;
 }
 
 .top {

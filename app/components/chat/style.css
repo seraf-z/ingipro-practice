@@ -1,14 +1,35 @@
 .chat {
-    width: 20%;
+    width: 250px;
+    position: absolute;
+    bottom: 0;
 }
 
 .chat.hide {
     display: none;
 }
 
+.chat-message {
+    height: 600px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 5px solid #385873;
+}
+
+.chat-input {
+    height: 50px;
+    width: 200px;
+    border: 2px solid #733434;
+}
+
+.chat-submit {
+    height: 45px;
+    width: 45px;
+    font-size: 20px;
+}
+
 .message {
-    padding: 12px;
-    font-size: 16px;
+    padding: 5px;
+    font-size: 14px;
     float: left;
     color: #4e5e73;
 }

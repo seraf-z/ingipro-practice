@@ -37,7 +37,7 @@ class Users {
 	    const userName = document.createElement('div');
 	    userName.className = 'userName';
 	    userName.innerHTML = item.name;
-	    newUser.appendChild(userName);    
+	    newUser.appendChild(userName);
 	}
 
     _addUser(payload) {
@@ -45,7 +45,7 @@ class Users {
 	}
 
     _deleteUser(payload) {
-	    this._domNode.getElementById(payload.userId).remove();
+	    document.getElementById(payload.userId).remove();
 	}
 }
 

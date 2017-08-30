@@ -7,7 +7,7 @@ module.exports = function (server) {
         reconnectionAttempts: 5,
     });
 
-    io.sockets.on('connection', (socket) => {
+    io.on('connection', (socket) => {
 
         socket
             .on('main', ({type, payload}) => {
@@ -22,14 +22,14 @@ module.exports = function (server) {
                 switch (type) {
                     case 'user:join':
                         const data = store.userAdd(payload.name);
-                        socket.id = data.userList[data.userList.length - 1].userId;
-                        socket.emit('main', {
-                            type: 'conference:sync',
-                            payload: data,
-                        });
+                        socket.user_id = data.userList[data.userList.length - 1].userId;
                         socket.broadcast.emit('main', {
                             type: 'conference:join',
                             payload: data.userList[data.userList.length - 1],
+                        });
+                        socket.emit('main', {
+                            type: 'conference:sync',
+                            payload: data,
                         });
                         break;
                     case 'canvas:lock':
@@ -49,16 +49,19 @@ module.exports = function (server) {
                             type: 'conference:unlock',
                         });
                         break;
+                    case 'chat:message':
+                        socket.broadcast.emit('main', {type, payload});
+                        break;
                     default:
                         if (store.addData(type, payload)) {
-                            socket.broadcast.emit('main', {type: payload});
+                            socket.broadcast.emit('main', {type, payload});
                         } else {
                             socket.emit('main', {type: 'access:denied'});
                         }
                 }
             })
             .on('disconnect', () => {
-                const user = store.userDel(socket.id);
+                const user = store.userDel(socket.user_id);
                 socket.broadcast.emit('main', {
                     type: 'conference:leave',
                     payload: user,

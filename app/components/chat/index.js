@@ -26,17 +26,21 @@ class Chat {
     }
 
     _addMessage(payload) {
+        if(!payload._fromServer) {
+            return;
+        }
+
         const newMessage = document.createElement('div');
         newMessage.className = 'message';
         this._text.appendChild(newMessage);
 
         const userName = document.createElement('span');
-        userName.innerHTML = `${payload.userName}: `;
+        userName.innerHTML = `${payload.userName} - `;
         newMessage.appendChild(userName);
 
         const time = document.createElement('span');
         const date = new Date;
-        time.innerHTML = `${date.toLocaleString()}: `;
+        time.innerHTML = `${date.toLocaleString()}:<br>`;
         newMessage.appendChild(time);
 
         const message = document.createElement('span');
