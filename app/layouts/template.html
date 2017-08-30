@@ -12,13 +12,22 @@
           <div class="input-group input-group-lg">
             <input type="text" class="form-control js-input">
             <span class="input-group-btn">
-              <button class="btn btn-default js-button" type="button">Подключиться</button>
+              <input class="btn btn-default" type="submit" value="Подключиться"/>
             </span>
           </div>
         </form>
     </div>
     <div class="wrapper hide">
         <div class="sidebar">
+            <!-- popup block with status of 3d part control acquiring -->
+            <div class="popup hide">
+                <div class="popup-locker popup-control-lock-status">
+                    <p class="popup-label"></p>
+                </div>
+                <div class="popup-locker active-locker">
+                    <p class="popup-label"></p>
+                </div>
+            </div>
             <div class="users hide">
                 <!-- users markup -->
             </div>

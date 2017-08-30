@@ -1,0 +1,56 @@
+/*general popup styles*/
+
+.popup-locker {
+  display: table;
+  width: 240px;
+  height: 60px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  position: relative;
+}
+
+.popup-locker.popup-control-lock-status {
+  position: absolute;
+  top: -70px;
+  left: 0;
+  z-index: 10;
+  transition: top 1s ease, background-color 0.5s ease;
+}
+
+.popup-locker.active-locker {
+  top: 0;
+  left: 0;
+  background-color: #a268b0;
+}
+
+/*label position*/
+
+.popup-locker.popup-show {
+  top: 0;
+}
+
+/*popup background styles*/
+
+.popup-locker.popup-try-lock {
+  background-color: #0099ff;
+}
+
+.popup-locker.popup-lock-accepted {
+  background: #58d865;
+}
+
+.popup-locker.popup-lock-denied {
+  background: #f94f4f;
+}
+
+
+/*inner label*/
+
+.popup-locker >  .popup-label {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 14pt;
+  color: white;
+}

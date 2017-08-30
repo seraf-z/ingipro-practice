@@ -26,10 +26,6 @@ class Chat {
     }
 
     _addMessage(payload) {
-        if(!payload._fromServer) {
-            return;
-        }
-
         const newMessage = document.createElement('div');
         newMessage.className = 'message';
         this._text.appendChild(newMessage);
@@ -46,6 +42,8 @@ class Chat {
         const message = document.createElement('span');
         message.innerHTML = payload.message;
         newMessage.appendChild(message);
+
+        this._text.scrollTop = 9999;
     }
 
     _send(event) {

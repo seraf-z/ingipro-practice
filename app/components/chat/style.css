@@ -1,7 +1,6 @@
 .chat {
-    width: 250px;
-    position: absolute;
-    bottom: 0;
+    flex-grow: 1;
+    height: 50%;
 }
 
 .chat.hide {
@@ -9,10 +8,11 @@
 }
 
 .chat-message {
-    height: 600px;
+    height: calc(100% - 50px);
     overflow-y: auto;
     overflow-x: auto;
     border: 5px solid #385873;
+    background: #fff;
 }
 
 .chat-input {

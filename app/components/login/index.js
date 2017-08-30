@@ -5,7 +5,7 @@ class Login {
     constructor(domNode) {
         this._domNode = domNode;
 
-        this._domNode.querySelector('.js-button').addEventListener('click', this._submit.bind(this));
+        this._domNode.querySelector('form').addEventListener('submit', this._submit.bind(this));
     }
 
     hide() {
@@ -16,12 +16,13 @@ class Login {
         this._domNode.classList.remove('hide');
     }
 
-    _submit() {
+    _submit(event) {
+        event.preventDefault();
         const value = this._domNode.querySelector('.js-input').value;
 
         if (value) {
             mediator.emit("user:join", { 'name': value });
-        }  
+        }
     }
 }
 
