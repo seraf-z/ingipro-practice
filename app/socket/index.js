@@ -18,7 +18,6 @@ module.exports = function (server) {
                         message: `Wrong type: ${type}`,
                     });
                 }
-
                 switch (type) {
                     case 'user:join':
                         const data = store.userAdd(payload.name);

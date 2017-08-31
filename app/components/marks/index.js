@@ -7,6 +7,7 @@ class Marks {
         document.addEventListener("keydown", this._onDownShiftPlusCtrl.bind(this), false);
         document.addEventListener("keyup", this._onUpShiftPlusCtrl.bind(this), false);
 
+        console.log(parent);
         // this.id = parent.globalId;
         this._user = user;
         this._flag = false;

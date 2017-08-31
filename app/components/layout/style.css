@@ -58,4 +58,13 @@
 
 .cell {
     background: ghostwhite;
+    overflow: hidden;
+}
+
+/* viewer */
+
+.layout .cell canvas {
+    width: 100% !important; /* ugly hack: virtual screen width growing */
+
+    display: block;
 }

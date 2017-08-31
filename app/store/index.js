@@ -52,9 +52,9 @@ exports.unlock = function (userId) {
 };
 
 exports.addData = function (type, payload) {
-    if (lock && userLock === payload.userId){
+    //if (lock && userLock === payload.userId){
         store[type] = payload;
         return true;
-    }
+    //}
     return false;
 };
