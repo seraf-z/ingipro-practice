@@ -24,8 +24,7 @@ server.listen(PORT, () => {
 
 io.sockets.on('connection', (socket) => {
     let user = {
-        //userID: shortid.generate(),
-        socketID: socket.id,
+        userId: Math.random(),
         color: randomColor(),
     };
 
@@ -35,6 +34,7 @@ io.sockets.on('connection', (socket) => {
             let type = data.type;
             console.dir(`type -> ${data.type}; payload -> ${data.payload}`);
             console.log(data.payload);
+
             switch (type) {
                 case 'user:join':
                     user.name = data.payload.name;
@@ -42,14 +42,14 @@ io.sockets.on('connection', (socket) => {
                     let conferenceSync = {
                         type: 'conference:sync',
                         payload: {
-                            userList: conference.users,
-                            state: conference.state
+                            users: conference.users,
+                            data: conference.state
                         }
                     };
                     let conferenceJoin = {
                         type: 'conference:join',
                         payload: {
-                            userId: user.userID,
+                            userId: user.userId,
                             name: user.name,
                             color: user.color
                         }
@@ -126,7 +126,7 @@ io.sockets.on('connection', (socket) => {
             let conferenceLeave = {
                 type: 'conference:leave',
                 payload: {
-                    userId: user.userID,
+                    userId: user.userId,
                     name: user.name,
                     color: user.color,
                 }
