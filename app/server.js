@@ -15,3 +15,5 @@ server.listen(PORT, () => {
 
 const io = require('./socket')(server);
 app.set('io', io);
+// eslint-disable-next-line
+console.log(`!!!`);
