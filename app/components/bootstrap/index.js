@@ -25,6 +25,7 @@ mediator.on('conference:sync', () => {
     layout.show();
     users.show();
     chat.show();
+    popup.show();
 
     document.querySelector('.wrapper').classList.remove('hide');
 });

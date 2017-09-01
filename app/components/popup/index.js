@@ -3,6 +3,7 @@ import './style.css';
 
 const SHOW_DURATION = 2000;
 const POPUP_SHOW_STYLE = 'popup-show';
+const INITIAL_LOCK_STATUS = 'Управление доступно для захвата';
 
 const LOCK_STATUS = {
     tryLock: 'Попытка захвата управления...',
@@ -19,13 +20,13 @@ const LABEL_STYLE = {
 class Popup {
 
     constructor(domNode) {
-        //parse .popup-locker 'div's
         this._domNodes = Array.from(domNode);
 
         //parse .popup-label 'p's into .popup-locker 'div's
         this._innerPs = this._domNodes.map((currVal) => {
             return currVal.querySelector('.popup-label');
         });
+        this._innerPs[1].innerHTML = INITIAL_LOCK_STATUS;
 
         this._timerId = null;
 
@@ -67,6 +68,18 @@ class Popup {
         this._resetDeferred();
     }
 
+    hide() {
+        this._domNodes.forEach((currNode) => {
+            currNode.classList.add('hide');
+        });
+    }
+
+    show() {
+        this._domNodes.forEach((currNode) => {
+            currNode.classList.remove('hide');
+        });
+    }
+
     lockStatusHandler(data, type) {
         const parsedType = type.split(':');
         let typeHandler = 'tryLock';
@@ -95,7 +108,7 @@ class Popup {
         if (eventType === 'lock') {
             status = 'Управление: ' + data.name;
         } else {
-            status = 'Управление доступно для захвата';
+            status = INITIAL_LOCK_STATUS;
         }
 
         this._innerPs[1].innerHTML = status;

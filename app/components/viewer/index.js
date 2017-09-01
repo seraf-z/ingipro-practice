@@ -4,12 +4,12 @@ import mediator from '../mediator';
 import './style.css';
 
 class Viewer {
-    constructor(parent, userId) {
-        this._parent = parent;
+    constructor(elem, globalId, userId) {
+        this._globalId = globalId;
         this._userId = userId;
 
         //Create drag&drop zone
-        this.createDragAndDropZone.bind(this)(this._parent.elem);
+        this.createDragAndDropZone.bind(this)(elem);
 
         //Create 3d scene
         this.create3dScene.bind(this)();
@@ -41,7 +41,7 @@ class Viewer {
 
         this._renderer.setSize(this._viewZone.clientWidth, this._viewZone.clientHeight);        //0, 0, but after resize it will be update
 
-        this._tanFOV = Math.tan(((Math.PI / 180) * this._camera.fov / 2));  //Needs for save model scale
+        this._tanFOV = Math.tan(((Math.PI / 180) * this._camera.fov / 2));                      //Needs for save model scale
 
         //this._windowHeight = this._viewZone.clientHeight;
         this._windowHeight = window.innerHeight;
@@ -98,7 +98,7 @@ class Viewer {
         const reader = new FileReader();
         reader.onload = ( theFile => {
             this._loader.load(theFile.target.result, this.loadCollada.bind(this));
-            mediator.emit('viewer:addModel', {url: theFile.target.result, userId: this._userId, globalId: this._parent.globalId});
+            mediator.emit('viewer:addModel', {url: theFile.target.result, userId: this._userId, globalId: this._globalId});
         });
         reader.readAsDataURL(file);
     }
@@ -111,7 +111,7 @@ class Viewer {
                 cameraQua: this._camera.quaternion,
                 cameraUp: this._camera.up,
                 userId: this._userId,
-                globalId: this._parent.globalId
+                globalId: this._globalId
             });
         }
         this._flag = false;
@@ -131,13 +131,14 @@ class Viewer {
     }
 
     addNewModel(payload) {
-        if (payload.userId !== this._userId && this._parent.globalId === payload.globalId) {
+
+        if (payload.userId !== this._userId && this._globalId === payload.globalId) {
             this._loader.load(payload.url, this.loadCollada.bind(this));
         }
     }
 
     newCameraPos(payload) {
-        if (payload.userId !== this._userId && this._parent.globalId === payload.globalId) {
+        if (payload.userId !== this._userId && this._globalId === payload.globalId) {
             this._camera.position.set(payload.cameraPos.x,
                 payload.cameraPos.y,
                 payload.cameraPos.z,);
@@ -156,8 +157,10 @@ class Viewer {
     }
 
     editCanvasSize() {
-        this._controls.screen.width = this._viewZone.clientWidth;   //Initials value = 0, therefore it needs to update
-        this._controls.screen.height = this._viewZone.clientHeight;
+        //this._controls.screen.width = this._viewZone.clientWidth;   //Initials value = 0, therefore it needs to update
+        //this._controls.screen.height = this._viewZone.clientHeight;
+
+        this._controls.handleResize();      //Initials value of screen = 0, therefore it needs to update
 
         this._camera.aspect = this._viewZone.clientWidth / this._viewZone.clientHeight;
 
