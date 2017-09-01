@@ -20,16 +20,17 @@
     <div class="wrapper hide">
         <div class="sidebar">
             <!-- popup block with status of 3d part control acquiring -->
-            <div class="popup hide">
-                <div class="popup-locker popup-control-lock-status">
-                    <p class="popup-label"></p>
-                </div>
-                <div class="popup-locker active-locker">
-                    <p class="popup-label"></p>
-                </div>
+            <div class="popup-locker popup-control-lock-status hide">
+                <p class="popup-label"></p>
+            </div>
+            <div class="popup-locker active-locker hide">
+                <p class="popup-label"></p>
             </div>
             <div class="users hide">
-                <!-- users markup -->
+                    <button class="microphone-button">
+                        <img src="https://png.icons8.com/microphone/ios7/25" class="microphone-icon">
+                        <span class="microphone-text">Микрофон включен</span>
+                    </button>
             </div>
             <div class="chat hide">
                 <div class="chat-message"></div>
@@ -43,5 +44,8 @@
     </div>
 
 	<script src="http://cdn.voximplant.com/edge/voximplant.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js'></script>
+    <script src='https://rawgit.com/mrdoob/three.js/master/examples/js/loaders/ColladaLoader.js'></script>
+    <script src='https://rawgit.com/mrdoob/three.js/master/examples/js/controls/TrackballControls.js'></script>
 </body>
 </html>

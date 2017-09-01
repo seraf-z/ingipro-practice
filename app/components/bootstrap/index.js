@@ -25,6 +25,7 @@ mediator.on('conference:sync', () => {
     layout.show();
     users.show();
     chat.show();
+    popup.show();
 
     document.querySelector('.wrapper').classList.remove('hide');
 });
@@ -32,3 +33,5 @@ mediator.on('conference:sync', () => {
 mediator.on('*', (data, type) => {
     console.info(`Event type: ${type}, data: ${data}`);
 });
+
+

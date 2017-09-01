@@ -5,7 +5,7 @@ class Users {
     constructor(domNode) {
         this._domNode = domNode;
 
-        // this._domNode.querySelector('.microphone-button').addEventListener('click', this._changeButton.bind(this));
+        document.querySelector('.microphone-button').addEventListener('click', this._changeButton.bind(this));
 
         this._currentUser = '';
         this._stateButton = true;

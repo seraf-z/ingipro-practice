@@ -2,18 +2,19 @@
 
 .popup-locker {
   display: table;
-  width: 240px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 250px;
   height: 60px;
   padding: 0;
   margin: 0;
   border: none;
-  position: relative;
 }
 
 .popup-locker.popup-control-lock-status {
-  position: absolute;
   top: -70px;
-  left: 0;
   z-index: 10;
   transition: top 1s ease, background-color 0.5s ease;
 }
