@@ -214,15 +214,11 @@ class Layout {
             this._tapes[parentId][id].lastFlexBasis = 0;
         }
 
+       
+        this._marks = new Marks(this._user, this._tapes[parentId][id]);
+        this._tapes[parentId][id].svg = this._marks.svg;
+        this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id], this._user.userId);
 
-        //this._marks = new Marks(this._user, this._tapes[parentId][id]);
-        //this._tapes[parentId][id].svg = this._marks.svg;
-
-
-        //this._viewer = new Viewer(this._tapes[parentId][id].elem, this._user.userId);
-        //this._tapes[parentId][id].svg = this._viewer.renderer.domElement;
-
-        this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id].elem, this._tapes[parentId][id].globalId, this._user.userId);
     }
 
     _changeLayout() {

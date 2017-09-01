@@ -4,8 +4,8 @@ import './style.css';
 
 class Marks {
     constructor(user, parent) {
-        document.addEventListener("keydown", this._onDownShiftPlusCtrl.bind(this), false);
-        document.addEventListener("keyup", this._onUpShiftPlusCtrl.bind(this), false);
+        document.addEventListener('keydown', this._onDownShiftPlusCtrl.bind(this), false);
+        document.addEventListener('keyup', this._onUpShiftPlusCtrl.bind(this), false);
 
         console.log(parent);
         // this.id = parent.globalId;
@@ -15,17 +15,19 @@ class Marks {
         this._color = this._user.color;
 
         this._domMark = d3.select(parent.elem);
-        this.svg = this._domMark.append("svg")
-        .on("mousedown", this.mousedown.bind(this))
-        .style("width", "100%")
-        .style("height", "100%");
+
+        this.svg = this._domMark.append('svg')
+            .on('mousedown', this.mousedown.bind(this))
+            .style('width', '100%')
+            .style('height', '100%')
+            .style('background-color', 'transparent');
 
         this.svg.data = [];
 
         this.line = d3.line()
-        .x(d => d[0])
-        .y(d => d[1])
-        .curve(d3.curveLinear);
+            .x(d => d[0])
+            .y(d => d[1])
+            .curve(d3.curveLinear);
         // this.metodChangeSVG = this.changeSVG.bind(this);
         // this.metodDrowNewLine = this.drowNewLine.bind(this);
         // this.metodDeleteAll = this.deleteAll.bind(this);
@@ -46,8 +48,7 @@ class Marks {
     // }
 
     _onDownShiftPlusCtrl(e) {
-        if (e.shiftKey === true && e.ctrlKey === true)
-            this._flag = true;
+        if (e.shiftKey === true && e.ctrlKey === true) {this._flag = true;}
     }
 
     _onUpShiftPlusCtrl(e) {
@@ -75,35 +76,38 @@ class Marks {
     deletePath(obj) {
 
         if (this.id === obj.id) {
-            this.svg.selectAll("path").remove();
+            this.svg.selectAll('path').remove();
         }
     }
 
     mousedown() {
+        console.log("mouse from marks");
         if (!this._flag) {
             return -1;
         }
 
         let data = [];
-        this.path = this.svg.append("path");
+        this.path = this.svg.append('path');
         this.path
-        .attr("stroke", this._color)
-        .attr("stroke-width", 4)
-        .attr("fill", "none");
+            .attr('stroke', this._color)
+            .attr('stroke-width', 4)
+            .attr('fill', 'none')
+            .attr('position', 'relative');
+
 
         this.svg
-        .on("mousemove", () => {
-            if (!this._flag) {
-                this.svg
-                .on("mousemove", null)
-                .on("mouseup", null);
-                return -1;
-            }
+            .on('mousemove', () => {
+                if (!this._flag) {
+                    this.svg
+                        .on('mousemove', null)
+                        .on('mouseup', null);
+                    return -1;
+                }
 
-            data.push(d3.mouse(this.svg.node()));
-            this.path.attr("d", this.line(data));
-        })
-        .on("mouseup", () => {
+                data.push(d3.mouse(this.svg.node()));
+                this.path.attr('d', this.line(data));
+            })
+            .on('mouseup', () => {
 
             // mediator.emit('marks:add', {
             //     id: this.id,
@@ -111,17 +115,17 @@ class Marks {
             //     otherColor: this._color
             // });
 
-            this.svg.on("mousemove", null);
-            if (data.length) {
-                this.svg.data[this._countLines++] = data.slice();
-            }
+                this.svg.on('mousemove', null);
+                if (data.length) {
+                    this.svg.data[this._countLines++] = data.slice();
+                }
 
-            // setTimeout( this._serializeSVG.bind(this), 20);
-            data = [];
-        });
+                // setTimeout( this._serializeSVG.bind(this), 20);
+                data = [];
+            });
     }
 
-    _serializeSVG () {
+    _serializeSVG() {
         let copy = this.svg.data;
         const payload = {
             userId: this._user.userId,
@@ -130,13 +134,14 @@ class Marks {
         mediator.emit('layout:change', payload);
     }
 
-    _handleSVG (payload) {
+    _handleSVG(payload) {
+        console.log('err');
         if (payload.userId === this._user.userId && payload.svg) {
             this._restoreSVG.bind(this)(payload);
         }
     }
 
-    _restoreSVG (payload) {
+    _restoreSVG(payload) {
         const copy2 = {};
 
 

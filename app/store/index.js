@@ -37,11 +37,11 @@ exports.userDel = function (userId) {
 };
 
 exports.lock = function (userId) {
-    if (!lock) {
+    //if (!lock) {
         userLock = userId;
         lock = true;
         return true;
-    }
+    //}
     return false;
 };
 
@@ -53,8 +53,8 @@ exports.unlock = function (userId) {
 
 exports.addData = function (type, payload) {
     //if (lock && userLock === payload.userId){
-        store[type] = payload;
-        return true;
+    store[type] = payload;
+    return true;
     //}
     return false;
 };

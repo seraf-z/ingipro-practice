@@ -7,7 +7,7 @@ class Viewer {
     constructor(elem, globalId, userId) {
         this._globalId = globalId;
         this._userId = userId;
-
+        console.log("Viewer created");
         //Create drag&drop zone
         this.createDragAndDropZone.bind(this)(elem);
 
@@ -28,16 +28,33 @@ class Viewer {
         this.mediatorOnEvents.bind(this)();
     }
 
+    _onDownCtrl(r) {
+        if (r.ctrlKey === true) {this._controls.enabled = true;}
+        if (r.shiftKey === true) {this._controls.enabled = false;}
+        if (r.shiftKey === true && r.ctrlKey === true) {this._controls.enabled = false;}
+    }
+
+    _onUpCtrl(e) {
+        if (e.ctrlKey === false) {
+            this._controls.enabled = false;
+        }
+    }
+    m(e) {
+        console.log('ctrl from viewer');
+        console.dir(e);
+    }
+
     create3dScene() {
         this._scene = new THREE.Scene();
-        //this._camera = new THREE.PerspectiveCamera(10, this._viewZone.clientWidth / this._viewZone.clientHeight, 1, 1000);    //Initials value = 0, therefore camera placed at infiniity
-        this._camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 1, 1000);
+        this._camera = new THREE.PerspectiveCamera(10, this._viewZone.clientWidth / this._viewZone.clientHeight, 1, 1000);    //Initials value = 0, therefore camera placed at infiniity
+        //this._camera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 1, 1000);
         this._camera.position.set(10, 10, 10);
         this._camera.lookAt(this._scene.position);
         this._renderer = new THREE.WebGLRenderer({
             alpha: true,
             antialias: true
         });
+
 
         this._renderer.setSize(this._viewZone.clientWidth, this._viewZone.clientHeight);        //0, 0, but after resize it will be update
 
@@ -48,9 +65,7 @@ class Viewer {
 
         this._viewZone.appendChild(this._renderer.domElement);
 
-        console.log(this._viewZone);
-
-        this._controls = new THREE.TrackballControls(this._camera, this._renderer.domElement);
+        this._controls = new THREE.TrackballControls(this._camera, this._viewZone);
         this._controls.rotateSpeed = 5.0;
         this._controls.zoomSpeed = 3.2;
         this._controls.panSpeed = 0.8;
@@ -59,6 +74,11 @@ class Viewer {
         this._controls.noRotate = false;
         this._controls.staticMoving = false;
         this._controls.dynamicDampingFactor = 0.2;
+        this._controls.enabled = false;
+        document.addEventListener('keydown', this._onDownCtrl.bind(this), false);
+        document.addEventListener('keyup', this._onUpCtrl.bind(this), false);
+
+
 
 
         const light_color  = '#FAFAFA',
