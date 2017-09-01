@@ -214,10 +214,10 @@ class Layout {
             this._tapes[parentId][id].lastFlexBasis = 0;
         }
 
-       
+
         this._marks = new Marks(this._user, this._tapes[parentId][id]);
         this._tapes[parentId][id].svg = this._marks.svg;
-        this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id], this._user.userId);
+        // this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id], this._user.userId);
 
 
         //this._marks = new Marks(this._user, this._tapes[parentId][id]);
@@ -400,15 +400,17 @@ class Layout {
         }
     }
     _closeStatusExternal() {
-        let cellId, tapeId, parentId;
+        let cellId;
+        let tapeId;
+        let parentId;
 
         if (this._external.status === 'createTape') {
-            tapeId = parseInt(this._external.elem.id);
-            cellId = (parseInt(tapeId) + 1) % 4;
+            tapeId = parseInt(this._external.elem.id, 10);
+            cellId = (parseInt(tapeId, 10) + 1) % 4;
             parentId = this._tapes[0].currentTapeId;
         } else {
             cellId = this._external.elem.id;
-            tapeId = (parseInt(cellId) + 1) % 4;
+            tapeId = (parseInt(cellId, 10) + 1) % 4;
             parentId = this._external.elem.tapeId;
         }
 
@@ -905,9 +907,9 @@ class Layout {
 
     _throttle(func, ms) {
 
-        let isThrottled = false,
-            savedArgs,
-            savedThis;
+        let isThrottled = false;
+        let savedArgs;
+        let savedThis;
 
         function wrapper() {
 
@@ -1072,9 +1074,9 @@ class Layout {
             }
         }
 
-        console.log(this._tapes);
-        console.log(copy2);
-        console.log(payload.layout);
+        // console.log(this._tapes);
+        // console.log(copy2);
+        // console.log(payload.layout);
     }
 }
 
