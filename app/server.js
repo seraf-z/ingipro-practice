@@ -32,8 +32,10 @@ io.sockets.on('connection', (socket) => {
         .on('main', data => {
 
             let type = data.type;
-            console.dir(`type -> ${data.type}; payload -> ${data.payload}`);
-            console.log(data.payload);
+            if (type !== 'viewer:change') {
+                console.dir(`type -> ${data.type}; payload -> ${data.payload}`);
+                console.log(data.payload);
+            }
 
             switch (type) {
                 case 'user:join':
@@ -42,19 +44,24 @@ io.sockets.on('connection', (socket) => {
                     let conferenceSync = {
                         type: 'conference:sync',
                         payload: {
-                            users: conference.users,
-                            data: conference.state
-                        }
+                            userList: conference.users,
+                            data: conference.state,
+                        },
                     };
                     let conferenceJoin = {
                         type: 'conference:join',
                         payload: {
                             userId: user.userId,
                             name: user.name,
-                            color: user.color
-                        }
+                            color: user.color,
+                        },
+                    };
+                    let viewerModel = {
+                        type: 'viewer:addModel',
+                        payload: conference.state.model,
                     };
                     socket.emit('main', conferenceSync);
+                    socket.emit('main', viewerModel);
                     socket.broadcast.emit('main', conferenceJoin);
                     break;
 
@@ -63,11 +70,11 @@ io.sockets.on('connection', (socket) => {
                         return item.owner === true;
                     });
 
-                    if ( a ) {
+                    if (a) {
                         let lockDenied = {
                             type: 'lock:denied',
                             payload: {
-                                userId: user.userID
+                                userId: user.userId,
                             }
                         };
                         socket.emit('main', lockDenied);
@@ -75,7 +82,7 @@ io.sockets.on('connection', (socket) => {
                         let lockAccept = {
                             type: 'lock:accept',
                             payload: {
-                                userId: user.userID
+                                userId: user.userId,
                             }
                         };
                         let conferenceLock = {
@@ -95,46 +102,49 @@ io.sockets.on('connection', (socket) => {
                     user.owner = false;
                     break;
 
-                case 'state:upload':
-                    if (user.owner === true) {
-                        conference.state = data.payload.state;
-                        let stateChange = {
-                            type: 'state:change',
-                            payload: {
-                                state: conference.state
-                            }
-                        };
-                        socket.broadcast.emit('main', stateChange);
-                    }
+                case 'viewer:change':
+                    conference.state.viewerChange = data.payload;
+                    let viewerChange = {
+                        type: 'viewer:change',
+                        payload: conference.state.viewerChange
+                    };
+                    socket.broadcast.emit('main', viewerChange);
+                    break;
+
+                case 'viewer:addModel':
+                    conference.state.model = data.payload;
+                    socket.broadcast.emit('main', {
+                        type: 'viewer:addModel',
+                        payload: conference.state.model,
+                    });
                     break;
 
                 case 'chat:message':
-                    let chatMessage = {
+                    socket.broadcast.emit('main', {
                         type: 'chat:message',
                         payload: {
                             userName: user.name,
-                            message: data.payload.message
-                        }
-                    };
-                    io.emit('main', chatMessage);
+                            message: data.payload.message,
+                        },
+                    });
                     break;
             }
         })
 
         .on('disconnect', () => {
             console.log(`user ${user.name} disconnect`);
-            let conferenceLeave = {
+            socket.broadcast.emit('main', {
                 type: 'conference:leave',
                 payload: {
                     userId: user.userId,
                     name: user.name,
                     color: user.color,
-                }
-            };
-            socket.broadcast.emit('main', conferenceLeave);
+                },
+            });
             let index = conference.users.indexOf(user);
             conference.users.splice(index, 1);
-            console.log(conference.users);
-
+            if (conference.users === 0){
+                conference.state = {};
+            }
         });
 });
