@@ -127,7 +127,7 @@ class Viewer {
                 this._texture.image = texture;
                 this._texture.needsUpdate = true;
             });
-            mediator.emit('viewer:addTexture', {
+            mediator.emit('texture:add', {
                 url: theFile.target.result,
                 userId: this._userId,
                 globalId: this._globalId
@@ -138,7 +138,7 @@ class Viewer {
         const objReader = new FileReader();
         objReader.onload = (theFile => {
             this._objLoader.load(theFile.target.result, this.loadObj.bind(this));
-            mediator.emit('viewer:addModel', {url: theFile.target.result, userId: this._userId, globalId: this._globalId});
+            mediator.emit('model:add', {url: theFile.target.result, userId: this._userId, globalId: this._globalId});
         });
         objReader.readAsDataURL(rightFileOrder[1]);
 
@@ -146,7 +146,7 @@ class Viewer {
 
     renderPhone() {
         if (!this._flag) {
-            mediator.emit('viewer:change', {
+            mediator.emit('camera:change', {
                 cameraPos: this._camera.position,
                 cameraRot: this._camera.rotation,
                 cameraQua: this._camera.quaternion,
@@ -248,9 +248,9 @@ class Viewer {
     }
 
     mediatorOnEvents() {
-        mediator.on('viewer:addModel', this.addNewModel.bind(this));
-        mediator.on('viewer:addTexture', this.addNewTexture.bind(this));
-        mediator.on('viewer:change', this.newCameraPos.bind(this));
+        mediator.on('model:add', this.addNewModel.bind(this));
+        mediator.on('texture:add', this.addNewTexture.bind(this));
+        mediator.on('camera:change', this.newCameraPos.bind(this));
         mediator.on('layout:change', this.editCanvasSize.bind(this));
         // mediator.on('conference:join', this.newUserJoin.bind(this));
         // mediator.on('conference:sync', this.newUserSync.bind(this));

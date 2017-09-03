@@ -1,10 +1,27 @@
 const randomColor = require('randomcolor');
 const uuidv4 = require('uuid/v4');
-const store = {
-    userList: [],
-};
+let store = {};
+initStore();
 let lock = false;
 let userLock;
+const types = ['camera', 'model', 'mark', 'camera', 'texture'];
+
+function initStore() {
+    store = {
+        userList: [],
+        layout: {},
+        model: {},
+        mark: {},
+        camera: {},
+        texture: {},
+    };
+}
+
+function resetStore() {
+    if (store.userList.length === 0){
+        initStore();
+    }
+}
 
 exports.getUser = function (userId) {
     for (let i = 0; i < store.userList.length; i++){
@@ -21,7 +38,6 @@ exports.userAdd = function (login) {
         name: login,
         color: randomColor({luminosity: 'light'}),
     });
-
     return store;
 };
 
@@ -30,6 +46,7 @@ exports.userDel = function (userId) {
         if (store.userList[i].userId === userId){
             const user = store.userList[i];
             store.userList.splice(i, 1);
+            resetStore();
             return user;
         }
     }
@@ -37,11 +54,11 @@ exports.userDel = function (userId) {
 };
 
 exports.lock = function (userId) {
-    //if (!lock) {
+    if (!lock) {
         userLock = userId;
         lock = true;
         return true;
-    //}
+    }
     return false;
 };
 
@@ -51,10 +68,36 @@ exports.unlock = function (userId) {
     }
 };
 
+exports.clearWindows = function (type, payload) {
+    const delElem = [];
+    if (store.layout.hasOwnProperty('layoutIDs')){
+        store.layout.layoutIDs.forEach((val) => {
+            if (!payload['layoutIDs'].includes(val)){
+                delElem.push(val);
+            }
+        });
+    } else {
+        store.layout.layoutIDs = [];
+    }
+
+
+    delElem.forEach(val => {
+        for (let key of types){
+            delete store[key][val];
+        }
+    });
+
+    store.layout = payload;
+};
+
+
 exports.addData = function (type, payload) {
-    //if (lock && userLock === payload.userId){
-    store[type] = payload;
+    // if (lock && userLock === payload.userId){
+    const nativeType = type.slice(0, type.indexOf(':'));
+    if (types.includes(nativeType)){
+        store[nativeType][payload.globalId] = payload;
+    }
     return true;
-    //}
-    return false;
+    // }
+    // return false;
 };

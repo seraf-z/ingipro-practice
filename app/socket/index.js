@@ -51,6 +51,10 @@ module.exports = function (server) {
                     case 'chat:message':
                         socket.broadcast.emit('main', {type, payload});
                         break;
+                    case 'layout:change':
+                        store.clearWindows(type, payload);
+                        socket.broadcast.emit('main', {type, payload});
+                        break;
                     default:
                         if (store.addData(type, payload)) {
                             socket.broadcast.emit('main', {type, payload});
@@ -60,6 +64,7 @@ module.exports = function (server) {
                 }
             })
             .on('disconnect', () => {
+                store.unlock(socket.user_id);
                 const user = store.userDel(socket.user_id);
                 socket.broadcast.emit('main', {
                     type: 'conference:leave',

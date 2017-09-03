@@ -23,6 +23,7 @@
 
 .line {
     cursor: pointer;
+    z-index: 3;
 }
 
 .tapeLine {
@@ -69,10 +70,6 @@
     width: 100% !important; /* ugly hack: virtual screen width growing */
     z-index: 1;
     display: block;
-}
-
-.layout .cell canvas {
-    z-index: 1;
     position: absolute;
     top: 0;
     right: 0;

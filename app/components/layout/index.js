@@ -7,15 +7,13 @@ import './style.css';
 class Layout {
 
     constructor(domNode) {
-        //@fixme remove `console.log`
-        // eslint-disable-next-line
-        console.log('"Layout" created');
         this._domNode = domNode;
 
         document.addEventListener('click', this._changeLayout.bind(this), false);
-        mediator.on('layout:change', this._handleLayout.bind(this));
-        mediator.on('conference:sync', this._getUser.bind(this));
-
+        document.addEventListener('keydown', this._onDownCtrl.bind(this), false);
+        document.addEventListener('keyup', this._onUpCtrl.bind(this), false);
+        document.addEventListener('contextmenu', this._onContextMenu.bind(this), false);
+        mediator.on('conference:sync', this._getUserAndLayout.bind(this));
     }
 
     hide() {
@@ -24,7 +22,23 @@ class Layout {
 
     show() {
         this._domNode.classList.remove('hide');
+
+        // create base layout
         setTimeout(this._createLayout.bind(this), 20);
+        setTimeout(this._setLayout.bind(this), 20);
+        mediator.on('layout:change', this._handleLayout.bind(this));
+    }
+
+    _onDownCtrl(e) {
+        if (e.ctrlKey === true) {this._enabled = true;}
+        if (e.shiftKey === true) {this._enabled = false;}
+        if (e.shiftKey === true && e.ctrlKey === true) {this._enabled = false;}
+    }
+
+    _onUpCtrl(e) {
+        if (e.ctrlKey === false) {
+            this._enabled = false;
+        }
     }
 
     _createLayout() {
@@ -36,14 +50,18 @@ class Layout {
         // min size/2 (%) of tape for deleting
         this._tapes = []; // store for tapes, lines and cells
 
-        this._createTapeBackground();
-        this._createTapeBorder();
-        this._createNewTape();
+        this._createTapeBackground();  // setup root node
+        this._createTapeBorder();      // create blue borders
+        this._createNewTape();         // create tape (includes cells)
 
-        this._createCellBackground();
-        this._createCellBorder();
-        this._createNewCell();
+        this._createCellBackground();  // add cell warapper to tape and tape to root node
+        this._createCellBorder();      // add black borders
+        this._createNewCell();         // create first cell
     }
+
+    /**
+     * setup root node
+     */
     _createTapeBackground() {
         this._domNode.id = 0;
 
@@ -59,6 +77,10 @@ class Layout {
         this._tapes[0].elem.style.margin = `${this._MARGIN }px`;
         this._addForLines = 2 * this._LINE_SIZE / this._tapes[0].elem.clientWidth * 100;
     }
+
+    /**
+     * creates blue borders
+     */
     _createTapeBorder() {
         for (let i = 1; i < 5; i++) {
             const elem = document.createElement('div');
@@ -102,6 +124,10 @@ class Layout {
         this._tapes[0].tapesNumber = 4;
         this._tapes[0].lastTapeId = 4;
     }
+
+    /**
+     * creates tape (includes cells)
+     */
     _createNewTape() {
         this._tapes[0].tapesNumber++;
         this._tapes[0].lastTapeId++;
@@ -114,7 +140,7 @@ class Layout {
         this._tapes[id].elem.id = id;
         this._tapes[0].currentTapeId = id;
 
-        if (id === 5) {
+        if (id === 5) {  // first tape?
             this._tapes[id].elem.style.flexBasis = '100%';
             this._tapes[id].lastFlexBasis = 100;
             this._tapes[id].elem.style.order = 500;
@@ -125,6 +151,10 @@ class Layout {
         }
     }
 
+    /**
+     * creates cell warapper and adds one to tape
+     * adds tape to root node
+     */
     _createCellBackground() {
         const parentId = this._tapes[0].lastTapeId;
 
@@ -142,6 +172,10 @@ class Layout {
 
         this._tapes[parentId].elem.appendChild(this._tapes[parentId][0].elem);
     }
+
+    /**
+     * creates black borders
+     */
     _createCellBorder() {
         const parentId = this._tapes[0].lastTapeId;
 
@@ -189,22 +223,31 @@ class Layout {
         this._tapes[parentId][0].lastCellId = 4;
 
     }
-    _createNewCell() {
+
+    /**
+     * creates new cell
+     */
+    _createNewCell(updateGlobalId = true) {
         const parentId = this._tapes[0].currentTapeId;
-        this._tapes[parentId][0].cellsNumber++;
-        this._tapes[parentId][0].lastCellId++;
+
+        if (updateGlobalId) {  // fix?
+            this._tapes[parentId][0].cellsNumber++;
+            this._tapes[parentId][0].lastCellId++;
+        }
+
         const id = this._tapes[parentId][0].lastCellId;
 
-        this._tapes[parentId][id] = {};
-        this._tapes[parentId][id].elem = document.createElement('div');
+        this._tapes[parentId][id] = {
+            elem: document.createElement('div'),
+        };
         this._tapes[parentId][id].elem.className = 'cell';
         this._tapes[parentId][id].elem.id = id;
         this._tapes[parentId][id].elem.tapeId = parentId;
 
         this._tapes[parentId][0].currentCellId = id;
-        this._tapes[parentId][id].globalId = ++this._tapes[0].cellsNumber;
+        this._tapes[parentId][id].globalId = ++this._tapes[0].cellsNumber;   // global id
 
-        if (id === 5) {
+        if (id === 5) {  // first cell?
             this._tapes[parentId][id].elem.style.flexBasis = '100%';
             this._tapes[parentId][id].lastFlexBasis = 100;
             this._tapes[parentId][id].elem.style.order = 500;
@@ -214,18 +257,11 @@ class Layout {
             this._tapes[parentId][id].lastFlexBasis = 0;
         }
 
-
+        // create marks
         this._marks = new Marks(this._user, this._tapes[parentId][id]);
         this._tapes[parentId][id].svg = this._marks.svg;
-        // this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id], this._user.userId);
 
-
-        //this._marks = new Marks(this._user, this._tapes[parentId][id]);
-        //this._tapes[parentId][id].svg = this._marks.svg;
-
-
-        //this._viewer = new Viewer(this._tapes[parentId][id].elem, this._user.userId);
-        //this._tapes[parentId][id].svg = this._viewer.renderer.domElement;
+        // create viewer
         this._tapes[parentId][id].viewer = new Viewer(this._tapes[parentId][id].elem, this._tapes[parentId][id].globalId, this._user.userId);
     }
 
@@ -248,7 +284,7 @@ class Layout {
         if (e.which !== 1) {return;}
         let line = {};
 
-        if (!e.target.classList || !e.target.classList.contains('line')) {
+        if (!e.target.classList || !e.target.classList.contains('line') || !this._enabled) {
             return;
         }
 
@@ -592,11 +628,13 @@ class Layout {
 
         if (parseFloat(this._next.elem.style.flexBasis) < this._MINSIZE / 2) {
             this._deleteNext (e);
+            setTimeout(this._serializeLayout.bind(this), 20);
             return false;
         }
 
         if (parseFloat(this._previous.elem.style.flexBasis) < this._MINSIZE / 2) {
             this._deletePrevious (e);
+            setTimeout(this._serializeLayout.bind(this), 20);
             return false;
         }
 
@@ -625,16 +663,15 @@ class Layout {
 
         if (parseFloat(this._next.elem.style.flexBasis) < this._MINSIZE / 2) {
             this._deleteNextCell (e);
+            setTimeout(this._serializeLayout.bind(this), 20);
             return;
         }
 
         if (parseFloat(this._previous.elem.style.flexBasis) < this._MINSIZE / 2) {
             this._deletePreviousCell (e);
+            setTimeout(this._serializeLayout.bind(this), 20);
             return;
         }
-
-        //this._tapes[this._next.elem.tapeId][this._next.elem.id].viewer.editCanvasSize();
-        //this._tapes[this._previous.elem.tapeId][this._previous.elem.id].viewer.editCanvasSize();
 
         setTimeout(this._serializeLayout.bind(this), 20);
 
@@ -935,56 +972,69 @@ class Layout {
         return wrapper;
     }
 
-    _getUser(payload) {
+    _getUserAndLayout(payload) {
         this._user = {
             userId: payload.userList[payload.userList.length - 1].userId,
             name: payload.userList[payload.userList.length - 1].name,
             color: payload.userList[payload.userList.length - 1].color,
         };
+        this._layout = payload['layout'];
+    }
+
+    _setLayout() {
+        if (!this._isEmpty(this._layout)) {
+            setTimeout(this._restoreLayout.bind(this)(this._layout), 20);
+        }
     }
 
     _serializeLayout() {
         const copy = [];
+        const IDs = [];
 
         for (let i = 0; i < this._tapes.length; i++) {
             if (!this._isEmpty(this._tapes[i])) {
                 copy[i] = {};
+
+                copy[i].elem = {};
+                copy[i].elem.id = this._tapes[i].elem.id;
+                if (i === 0) {
+                    copy[i].elem.flexDirection = this._tapes[i].elem.style.flexDirection;
+                }
+                if (i > 4) {
+                    copy[i].elem.flexBasis = this._tapes[i].elem.style.flexBasis;
+                    copy[i].elem.order = this._tapes[i].elem.style.order;
+                }
+
                 for (let parentKey in this._tapes[i]) {
+                    if (parentKey === 'elem') {
+                        continue;
+                    }
+
                     if (isNaN(parentKey)) {
-                        if (parentKey !== 'elem') {
-                            copy[i][parentKey] = this._tapes[i][parentKey];
-                        } else {
-                            copy[i].elem = {};
-                            copy[i].elem.id = this._tapes[i].elem.id;
-                            if (i === 0) {
-                                copy[i].elem.flexDirection = this._tapes[i].elem.style.flexDirection;
-                            }
-                            if (i > 4) {
-                                copy[i].elem.flexBasis = this._tapes[i].elem.style.flexBasis;
-                                copy[i].elem.order = this._tapes[i].elem.style.order;
-                            }
-                        }
+                        copy[i][parentKey] = this._tapes[i][parentKey];
                     } else {
                         copy[i][parentKey] = {};
+
+                        copy[i][parentKey].elem = {};
+                        copy[i][parentKey].elem.id = this._tapes[i][parentKey].elem.id;
+                        copy[i][parentKey].elem.tapeId = this._tapes[i][parentKey].elem.tapeId;
+                        if (parentKey === '0') {
+                            copy[i][parentKey].elem.flexDirection = this._tapes[i][parentKey].elem.style.flexDirection;
+                        }
+                        if (parentKey > 4) {
+                            copy[i][parentKey].elem.flexBasis = this._tapes[i][parentKey].elem.style.flexBasis;
+                            copy[i][parentKey].elem.order = this._tapes[i][parentKey].elem.style.order;
+                        }
+
                         for (let key in this._tapes[i][parentKey]) {
-                            if (key !== 'elem' && key !== 'viewer') {
-                                // if (key === "svg") {
-                                //         copy[i][parentKey].svg = this._tapes[i][parentKey].svg.data;
-                                // } else {
-                                copy[i][parentKey][key] = this._tapes[i][parentKey][key];
-                                // }
-                            } else {
-                                copy[i][parentKey].elem = {};
-                                copy[i][parentKey].elem.id = this._tapes[i][parentKey].elem.id;
-                                copy[i][parentKey].elem.tapeId = this._tapes[i][parentKey].elem.tapeId;
-                                if (parentKey === '0') {
-                                    copy[i][parentKey].elem.flexDirection = this._tapes[i][parentKey].elem.style.flexDirection;
-                                }
-                                if (parentKey > 4) {
-                                    copy[i][parentKey].elem.flexBasis = this._tapes[i][parentKey].elem.style.flexBasis;
-                                    copy[i][parentKey].elem.order = this._tapes[i][parentKey].elem.style.order;
-                                }
+                            if (key === 'elem' || key === 'svg' || key === 'viewer') {
+                                continue;
                             }
+                            if (key === 'globalId') {
+                                IDs.push(this._tapes[i][parentKey][key]);
+                            }
+
+                            copy[i][parentKey][key] = this._tapes[i][parentKey][key];
                         }
                     }
                 }
@@ -994,89 +1044,146 @@ class Layout {
         const payload = {
             userId: this._user.userId,
             layout: copy,
+            layoutIDs: IDs,
         };
+
         mediator.emit('layout:change', payload);
     }
 
     _handleLayout(payload) {
-        if (payload.userId === this._user.userId && payload.layout) {
-            // console.log('qwerty');
-            // this._restoreLayout.bind(this)(payload);
+        if (payload.userId !== this._user.userId) {
+            this._restoreLayout.bind(this)(payload);
         }
     }
 
     _restoreLayout(payload) {
-        const copy2 = [];
-
         for (let i = 0; i < payload.layout.length; i++) {
             if (!this._isEmpty(payload.layout[i])) {
-                copy2[i] = {};
-                for (let parentKey in payload.layout[i]) {
-                    if (isNaN(parentKey)) {
-                        if (parentKey !== 'elem') {
-                            copy2[i][parentKey] = payload.layout[i][parentKey];
-                        } else {
-                            if (i > 4) {
-                                copy2[i].elem = document.createElement('div');
-                                if (i % 2) {
-                                    copy2[i].elem.className = 'tape';
-                                    this._createCellBackground();
-                                    this._createCellBorder();
-                                    this._createNewCell();
-                                } else {
-                                    copy2[i].elem.className = 'line tapeLine';
-                                }
-                            } else {
-                                copy2[i].elem = this._tapes[i].elem;
-                            }
-                            copy2[i].elem.id = payload.layout[i].elem.id;
-                            if (i === 0) {
-                                copy2[i].elem.style.flexDirection = payload.layout[i].elem.flexDirection;
-                            }
-                            if (i > 4) {
-                                copy2[i].elem.style.flexBasis = payload.layout[i].elem.flexBasis;
-                                copy2[i].elem.style.order = payload.layout[i].elem.order;
-                            }
-                        }
+
+                // check is not tape exist and create one
+                if (this._isEmpty(this._tapes[i])) {
+                    this._tapes[i] = {};
+                }
+
+                // if more than one tape
+                if (i > 5 && !this._tapes[i].elem) {
+                    this._tapes[i].elem = document.createElement('div');
+
+                    // create tape
+                    if (parseInt(i, 10) % 2) {
+                        this._tapes[i].elem.className = 'tape';
+
+                        this._createCellBackground();
+                        this._createCellBorder();
+                        this._tapes[0].cellsNumber--; // wtf
+                        this._createNewCell(false);
+                        this._tapes[i][0].elem.appendChild(this._tapes[i][5].elem);
+
+                    // create tape line
                     } else {
-                        copy2[i][parentKey] = {};
-                        for (let key in payload.layout[i][parentKey]) {
-                            if (key !== 'elem') {
-                                // if (key === "svg") {
-                                //         copy[i][parentKey].svg = this._tapes[i][parentKey].svg.data;
-                                // } else {
-                                copy2[i][parentKey][key] = payload.layout[i][parentKey][key];
-                                // }
+                        this._tapes[i].elem.className = 'line tapeLine';
+                    }
+
+                    // add to dom
+                    this._tapes[i].elem.id = payload.layout[i].elem.id;
+                    this._tapes[0].elem.appendChild(this._tapes[i].elem);
+                }
+
+                // tune root elem (settings)
+                if (i === 0) {
+                    this._tapes[i].elem.style.flexDirection = payload.layout[i].elem.flexDirection;
+                }
+
+                // tune tapes (settings)
+                if (i > 4) {
+                    this._tapes[i].elem.style.flexBasis = payload.layout[i].elem.flexBasis;
+                    this._tapes[i].elem.style.order = payload.layout[i].elem.order;
+                }
+
+                // process children nodes
+                for (let parentKey in payload.layout[i]) {
+                    if (parentKey === 'elem') { // skip root node
+                        continue;
+                    }
+
+                    // check is key number?
+                    if (isNaN(parentKey)) {
+                        // replace data by server data
+                        this._tapes[i][parentKey] = payload.layout[i][parentKey];
+                    } else {
+                        // check is tape exist and create one
+                        if (this._isEmpty(this._tapes[i][parentKey])) {
+                            this._tapes[i][parentKey] = {};
+                        }
+
+                        // if more than one tape children
+                        if (parentKey > 5 && !this._tapes[i][parentKey].hasOwnProperty('elem')) {
+                            this._tapes[i][parentKey].elem = document.createElement('div');
+
+                            // create cell
+                            if (parseInt(parentKey, 10) % 2) {
+                                this._tapes[i][parentKey].elem.className = 'cell';
+
+                                this._tapes[i][parentKey].globalId = payload.layout[i][parentKey].globalId;
+
+                                this._marks = new Marks(this._user, this._tapes[i][parentKey]);
+                                this._tapes[i][parentKey].svg = this._marks.svg;
+
+                                this._tapes[i][parentKey].viewer = new Viewer(this._tapes[i][parentKey].elem, this._tapes[i][parentKey].globalId, this._user.userId);
+
+                            // create separator
                             } else {
-                                if (i > 4) {
-                                    copy2[i][parentKey].elem = document.createElement('div');
-                                    if (i % 2) {
-                                        copy2[i][parentKey].elem.className = 'cell';
-                                    } else {
-                                        copy2[i][parentKey].elem.className = 'line cellLine';
-                                    }
-                                } else {
-                                    copy2[i].elem = this._tapes[i][parentKey].elem;
-                                }
-                                copy2[i][parentKey].elem.id = payload.layout[i][parentKey].elem.id;
-                                copy2[i][parentKey].elem.tapeId = payload.layout[i][parentKey].elem.tapeId;
-                                if (parentKey === '0') {
-                                    copy2[i][parentKey].elem.style.flexDirection = payload.layout[i][parentKey].elem.flexDirection;
-                                }
-                                if (parentKey > 4) {
-                                    copy2[i][parentKey].elem.style.flexBasis = payload.layout[i][parentKey].elem.flexBasis;
-                                    copy2[i][parentKey].elem.style.order = payload.layout[i][parentKey].elem.order;
-                                }
+                                this._tapes[i][parentKey].elem.className = 'line cellLine';
                             }
+
+                            // append to dom
+                            this._tapes[i][parentKey].elem.id = payload.layout[i][parentKey].elem.id;
+                            this._tapes[i][parentKey].elem.tapeId = payload.layout[i][parentKey].elem.tapeId;
+                            this._tapes[i][0].elem.appendChild(this._tapes[i][parentKey].elem);
+                        }
+
+                        // tune ? (settings)
+                        if (parentKey === '0') {
+                            this._tapes[i][parentKey].elem.style.flexDirection = payload.layout[i][parentKey].elem.flexDirection;
+                        }
+                        if (parentKey > 4) {
+                            this._tapes[i][parentKey].elem.style.flexBasis = payload.layout[i][parentKey].elem.flexBasis;
+                            this._tapes[i][parentKey].elem.style.order = payload.layout[i][parentKey].elem.order;
+                        }
+
+                        for (let key in payload.layout[i][parentKey]) {
+                            if (key === 'elem' || key === 'svg' || key === 'viewer' || key === 'globalId') {
+                                continue;
+                            }
+                            this._tapes[i][parentKey][key] = payload.layout[i][parentKey][key];
                         }
                     }
                 }
+
+                // cleaning
+                for (let parentKey in this._tapes[i]) {
+                    if (isNaN(parentKey)) {
+                        continue;
+                    }
+
+                    if (this._isEmpty(payload.layout[i][parentKey])) {
+                        this._tapes[i][0].elem.removeChild(this._tapes[i][parentKey].elem);
+                        delete this._tapes[i][parentKey];
+                    }
+                }
+
+            // cleaning
+            } else {
+                if (!this._isEmpty(this._tapes[i])) {
+                    this._tapes[0].elem.removeChild(this._tapes[i].elem);
+                    delete this._tapes[i];
+                }
             }
         }
+    }
 
-        // console.log(this._tapes);
-        // console.log(copy2);
-        // console.log(payload.layout);
+    _onContextMenu(e) {
+        e.preventDefault();
     }
 }
 

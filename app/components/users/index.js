@@ -5,15 +5,8 @@ class Users {
     constructor(domNode) {
         this._domNode = domNode;
 
-        document.querySelector('.microphone-button').addEventListener('click', this._changeButton.bind(this));
-
-        this._currentUser = '';
-        this._stateButton = true;
-
         mediator.on('conference:sync', this._showUsers.bind(this));
-        mediator.on('conference:join', this._addUser.bind(this));
         mediator.on('conference:leave', this._deleteUser.bind(this));
-
     }
 
     hide() {
@@ -27,7 +20,7 @@ class Users {
     _showUsers(payload) {
         payload.userList.forEach(item => this._showUser(item));
 
-        this._currentUser = payload.userList[payload.userList.length - 1];
+        mediator.on('conference:join', this._addUser.bind(this));
     }
 
     _showUser(item) {
@@ -54,23 +47,6 @@ class Users {
 
     _deleteUser(payload) {
         document.getElementById(payload.userId).remove();
-    }
-
-    _changeButton() {
-        const microphoneButton = this._domNode.querySelector('.microphone-text');
-        const microphoneIcon = this._domNode.querySelector('.microphone-icon');
-
-        mediator.emit('voice:mute', this._currentUser);
-
-        if (this._stateButton === true) {
-            this._stateButton = false;
-            microphoneButton.innerHTML = 'Микрофон выключен';
-            microphoneIcon.src = 'https://png.icons8.com/mute-unmute/ios7/25';
-        } else {
-            this._stateButton = true;
-            microphoneButton.innerHTML = 'Микрофон включен';
-            microphoneIcon.src = 'https://png.icons8.com/microphone/ios7/25';
-        }
     }
 }
 

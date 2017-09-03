@@ -31,7 +31,10 @@ mediator.on('conference:sync', () => {
 });
 
 mediator.on('*', (data, type) => {
-    console.info(`Event type: ${type}, data: ${data}`);
+    /* eslint-disable no-console  */
+    console.info(`Event type: ${type}`);
+    console.info(data);
+    /* eslint-enable no-console  */
 });
 
 

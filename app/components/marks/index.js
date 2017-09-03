@@ -7,8 +7,8 @@ class Marks {
         document.addEventListener('keydown', this._onDownShiftPlusCtrl.bind(this), false);
         document.addEventListener('keyup', this._onUpShiftPlusCtrl.bind(this), false);
 
-        console.log(parent);
-        // this.id = parent.globalId;
+        this._globalId = parent.globalId;
+
         this._user = user;
         this._flag = false;
         this._countLines = 0;
@@ -21,8 +21,7 @@ class Marks {
             .style('width', '100%')
             .style('height', '100%')
             .style('background-color', 'transparent');
-
-        this.svg.data = [];
+        this._data = [];
 
         this.line = d3.line()
             .x(d => d[0])
@@ -31,7 +30,7 @@ class Marks {
         // this.metodChangeSVG = this.changeSVG.bind(this);
         // this.metodDrowNewLine = this.drowNewLine.bind(this);
         // this.metodDeleteAll = this.deleteAll.bind(this);
-        mediator.on('layout:change', this._handleSVG.bind(this));
+        mediator.on('svg:change', this._handleSVG.bind(this));
         // mediator.on('layout:change', this.deletePath.bind(this));
         // mediator.on('3d:turn', this.metodDeleteAll);
         // mediator.on('3d:zoom', this.metodDeleteAll);
@@ -72,16 +71,14 @@ class Marks {
     //     .style("width", width)
     //     .style("height", height);
     // }
-
-    deletePath(obj) {
-
-        if (this.id === obj.id) {
-            this.svg.selectAll('path').remove();
-        }
-    }
+    // deletePath(obj) {
+    //
+    //     if (this.id === obj.id) {
+    //         this.svg.selectAll('path').remove();
+    //     }
+    // }
 
     mousedown() {
-        console.log("mouse from marks");
         if (!this._flag) {
             return -1;
         }
@@ -116,38 +113,53 @@ class Marks {
             // });
 
                 this.svg.on('mousemove', null);
-                if (data.length) {
-                    this.svg.data[this._countLines++] = data.slice();
-                }
+                // if (data.length) {
+                //     this._data[this._countLines++] = data.slice();
+                // }
+                this._data = data.slice(); // but conf:sync wont be so easy
 
-                // setTimeout( this._serializeSVG.bind(this), 20);
+                setTimeout(this._serializeSVG.bind(this), 20);
                 data = [];
             });
     }
 
     _serializeSVG() {
-        let copy = this.svg.data;
+        let copy = this._data;
         const payload = {
             userId: this._user.userId,
+            globalId: this._globalId,
+            userColor: this._color,
             svg: copy,
         };
-        mediator.emit('layout:change', payload);
+        mediator.emit('svg:change', payload);
     }
 
     _handleSVG(payload) {
-        console.log('err');
-        if (payload.userId === this._user.userId && payload.svg) {
+        if (payload.userId !== this._user.userId && payload.globalId === this._globalId) {
             this._restoreSVG.bind(this)(payload);
         }
     }
 
+    _isEmpty(obj) {
+        for (let key in obj) {
+            return false;
+        }
+        return true;
+    }
+
     _restoreSVG(payload) {
-        const copy2 = {};
+        if (this._isEmpty(this.path)) {
+            this.path = this.svg.append('path');
+            this.path
+                .attr('stroke', payload.userColor)
+                .attr('stroke-width', 4)
+                .attr('fill', 'none')
+                .attr('position', 'relative');
+        }
 
-
-        console.log(this.svg);
-        console.log(copy2);
-        console.log(payload.svg);
+        this.path
+            .attr('stroke', payload.userColor)
+            .attr('d', this.line(payload.svg));
     }
 
     // drowNewLine(obj) {

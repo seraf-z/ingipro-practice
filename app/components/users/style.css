@@ -1,4 +1,5 @@
 .users {
+    overflow: auto;
     box-sizing: border-box;
     flex-grow: 1;
     padding-top: 70px;
