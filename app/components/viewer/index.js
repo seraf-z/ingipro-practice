@@ -7,6 +7,7 @@ class Viewer {
     constructor(elem, globalId, userId) {
         this._globalId = globalId;
         this._userId = userId;
+        console.log(globalId);
         console.log("Viewer created");
         //Create drag&drop zone
         this.createDragAndDropZone.bind(this)(elem);
@@ -247,11 +248,23 @@ class Viewer {
         this._renderer.render(this._scene, this._camera);
     }
 
+    syncViewer(payload) {
+        for (let key in payload.model) {
+            if (this._userId !== payload.model[key].userId && this._globalId === payload.model[key].globalId) {
+                this.addNewModel.bind(this)(payload.model[key]);
+                this.addNewTexture.bind(this)(payload.texture[key]);
+                this.newCameraPos.bind(this)(payload.camera[key]);
+                this.editCanvasSize.bind(this)();
+            }
+        }
+    }
+
     mediatorOnEvents() {
         mediator.on('model:add', this.addNewModel.bind(this));
         mediator.on('texture:add', this.addNewTexture.bind(this));
         mediator.on('camera:change', this.newCameraPos.bind(this));
         mediator.on('layout:change', this.editCanvasSize.bind(this));
+        mediator.on('viewer:sync', this.syncViewer.bind(this));
         // mediator.on('conference:join', this.newUserJoin.bind(this));
         // mediator.on('conference:sync', this.newUserSync.bind(this));
         // mediator.on('viewer:addData', this.addViewer.bind(this));

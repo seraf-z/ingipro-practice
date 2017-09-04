@@ -28,7 +28,6 @@ class Chat {
     _addMessage(payload) {
         const newMessage = document.createElement('div');
         newMessage.className = 'message';
-        this._text.appendChild(newMessage);
 
         const userName = document.createElement('span');
         userName.innerHTML = `${payload.userName} - `;
@@ -42,6 +41,8 @@ class Chat {
         const message = document.createElement('span');
         message.innerHTML = payload.message;
         newMessage.appendChild(message);
+
+        this._text.appendChild(newMessage);
 
         this._text.scrollTop = 9999;
     }
